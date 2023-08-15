@@ -44,7 +44,6 @@ class Ui_Form(QDialog):
         layoutbase.addLayout(self.layout2)
         layoutbase.addLayout(self.layout3)
 
-        # Connect the buttons to the lambda functions to get the directory path
         self.btn1.clicked.connect(
             lambda: self.get_directory_path(self.srcPath, "pathSrc"))
         self.btn2.clicked.connect(
@@ -60,20 +59,14 @@ class Ui_Form(QDialog):
 
     def get_directory_path(self, path: list, setting_key: str):
         directory = QFileDialog.getExistingDirectory(self, "Select a folder:")
-        print("dd", directory)
-        print("pp", path)
-        if directory:  # Check if a directory was selected
+        if directory:
             path[0] = directory
             settings = QSettings("AdCream", "DirectorySynchronizer")
             settings.setValue(setting_key, directory)
-            settings.setValue("geometry", self.saveGeometry())
-
-        print("log:path ", "src: ", self.srcPath[0], "dst: ", self.dstPath[0])
 
         self.format_label_text(self.srcPath[0], self.dstPath[0])
 
     def loadSettings(self):
-        # Load the directory paths from QSettings and set them to the labels
         settings = QSettings("AdCream", "DirectorySynchronizer")
         self.srcPath[0] = settings.value("pathSrc", "")
         self.dstPath[0] = settings.value("pathDst", "")
@@ -84,19 +77,15 @@ class Ui_Form(QDialog):
         synchronizer.syncDirectories()
 
     def format_label_text(self, src_dir: str, dst_dir: str) -> (str, str):
-        # Split the paths into parts
         src_parts = src_dir.split(os.sep)
         dst_parts = dst_dir.split(os.sep)
 
-        # Find the common prefix
         common_prefix = os.path.commonprefix([src_parts, dst_parts])
         common_path = os.sep.join(common_prefix)
 
-        # Find the unique tails for each path
         src_unique = os.sep.join(src_parts[len(common_prefix):])
         dst_unique = os.sep.join(dst_parts[len(common_prefix):])
 
-        # Format the paths
         self.label1.setText(common_path + "\n" + src_unique)
         self.label2.setText(common_path + "\n" + dst_unique)
 
